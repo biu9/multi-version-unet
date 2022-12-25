@@ -1,4 +1,4 @@
-### multi-version-unet for ACDC dataset
+### multi-view-unet for ACDC dataset
 
 Combining co-training with unet, using the autoencoder to split different sub dataset and produce pseudo label
 
