@@ -1,0 +1,8 @@
+nohup.out
+/visualize
+/tmp
+/model/result
+/model/__pycache__
+/tmpSave
+/tmpSave/totalSim.txt
+/utils/__pycache__
