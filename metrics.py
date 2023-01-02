@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 from utils.load import MyDataset
 from matplotlib import pyplot as plt
 
-MODEL_FINAL_PATH = '/home/ubuntu/multi-version-unet/model/result/final/epoch_150.pth' 
+MODEL_FINAL_PATH = '/home/ubuntu/multi-version-unet/model/result/final/epoch_200.pth' 
 MODEL_FULL_PATH = '/home/ubuntu/multi-version-unet/model/result/full/epoch_100.pth' # model trained with full train img
 MODEL_BASELINE_PATH = '/home/ubuntu/multi-version-unet/model/result/final_baseline/epoch_200.pth'
 TEST_DATA_PATH = '/home/ubuntu/multiversion-unet/data/testing'
@@ -50,7 +50,7 @@ def save_nii(img_path, data, affine, header):
 
 if __name__ == '__main__':
     model = UNet(3,3).to(DEVICE)
-    model.load_state_dict(torch.load(MODEL_BASELINE_PATH))
+    model.load_state_dict(torch.load(MODEL_FINAL_PATH))
     model.eval()
 
     for (dirpath, dirnames, filenames) in os.walk(TEST_DATA_PATH):
@@ -77,8 +77,8 @@ if __name__ == '__main__':
                     saveImage = saveImage.detach().cpu().numpy()
                     if('01' in filename.split('_')[1]):
                         saveFileame = filename.split('_')[0] + '_ED.nii.gz'
-                        save_nii(os.path.join(SEGMENTATION_RESULT_BEFORE_PATH, saveFileame), saveImage, affine, header)
+                        save_nii(os.path.join(SEGMENTATION_RESULT_AFTER_PATH, saveFileame), saveImage, affine, header)
                     else:
                         saveFileame = filename.split('_')[0] + '_ES.nii.gz'
-                        save_nii(os.path.join(SEGMENTATION_RESULT_BEFORE_PATH, saveFileame), saveImage, affine, header)
+                        save_nii(os.path.join(SEGMENTATION_RESULT_AFTER_PATH, saveFileame), saveImage, affine, header)
 

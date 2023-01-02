@@ -26,22 +26,60 @@ MODEL_INIT2_PATH = '/home/ubuntu/multi-version-unet/model/result/init_2/epoch_30
 MODEL_CANNY1_PATH = '/home/ubuntu/multi-version-unet/model/result/canny_1/epoch_300.pth'
 MODEL_CANNY2_PATH = '/home/ubuntu/multi-version-unet/model/result/canny_2/epoch_300.pth'
 PSEUDO_PATH = '/home/ubuntu/multi-version-unet/tmpSave/pseudoLabel'
-ENCODER_PATH = '/home/ubuntu/multiversion-unet/encoder.pth'
+ENCODER_PATH = '/home/ubuntu/multi-version-unet/model/result/encoder/encoder_200.pth'
+
+def trainEncoder(): 
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    model = UNetEncoder(3,3).to(device)
+    optimizer = torch.optim.Adadelta(model.parameters(), lr=0.5)
+    lossFunc=  nn.MSELoss()
+    train_data = MyDataset()
+    test_data = MyDataset(ifTrain=False)
+    train_loader = DataLoader(train_data,
+                            shuffle=True,
+                            batch_size=1)
+    test_loader = DataLoader(test_data,
+                            shuffle=True,
+                            batch_size=1)
+    minLoss = 100
+    for epoch in tqdm(range(201)):
+        lossItem = []
+        for iteration, (train_img, train_label,index) in enumerate(train_loader):
+            train_img = train_img.to(device)
+            train_label = train_label.to(device)
+            train_img = train_img.squeeze(0)
+
+            encoded,decoded = model(train_img)
+            loss = lossFunc(decoded, train_img)
+
+            if iteration % 20 == 0:
+                optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            lossItem.append(loss.item())
+
+        print(f'epoch: {epoch}, loss: {sum(lossItem)/len(lossItem)}')
+        if (epoch%10==0):
+            torch.save(model.state_dict(),'/home/ubuntu/multi-version-unet/model/result/encoder/encoder_'+str(epoch)+'.pth')
 
 def calSimilarity(train_loader):
     allTrainSim = []
-    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    autoEncoder = UNetEncoder(1,1).to(device)
+    #device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    device = torch.device('cpu')
+    autoEncoder = UNetEncoder(3,3).to(device)
     autoEncoder.load_state_dict(torch.load(ENCODER_PATH))
     with open(TOTAL_SIM_PATH, 'w+') as f:
-        for iteration_i, (train_img_i, train_label,i) in (enumerate(train_loader)):
+        for iteration_i, (train_img_i, train_label,i) in tqdm(enumerate(train_loader)):
             oneImgSim = 0 # similarity of i index img with all other imgs
             train_img_i = train_img_i.squeeze(0)
+            train_img_i = train_img_i.to(device)
             for iteration_j, (train_img_j, train_label,j) in enumerate(train_loader):
                 train_img_j = train_img_j.squeeze(0)
-                encoded1,decoded1 = autoEncoder(train_img_i[0,0,:,:].unsqueeze(0).unsqueeze(0))
-                encoded2,decoded2 = autoEncoder(train_img_j[0,0,:,:].unsqueeze(0).unsqueeze(0))
-                sim = torch.cosine_similarity(encoded1,encoded2,dim=1)
+                train_img_j = train_img_j.to(device)
+                encoded1,decoded1 = autoEncoder(train_img_i)
+                encoded2,decoded2 = autoEncoder(train_img_j)
+                sim = torch.cosine_similarity(encoded1[0,:,:,:],encoded2[0,:,:,:],dim=0)
                 avg = torch.mean(sim)
                 oneImgSim += avg.item()
             allTrainSim.append(oneImgSim)
@@ -276,7 +314,7 @@ def loadModels():
 def producePseudoLabelNew(test_loader,train_loader):
 
     device = torch.device('cpu')
-    autoEncoder = UNetEncoder(1,1).to(device)
+    autoEncoder = UNetEncoder(3,3).to(device)
     autoEncoder.load_state_dict(torch.load(ENCODER_PATH))
     fullModel,initModel1,initModel2,cannyModel1,cannyModel2 = loadModels()
     initModel1 = initModel1.to(device)
@@ -296,9 +334,9 @@ def producePseudoLabelNew(test_loader,train_loader):
         oneImgSim = 0 # similarity of i index img with all other imgs
         for iteration_train, (train_img, train_label,index_train) in (enumerate(train_loader)):
             train_img = train_img.squeeze(0).to(device)
-            test_encoded,test_decoded = autoEncoder(test_img[0,0,:,:].unsqueeze(0).unsqueeze(0)) 
-            train_encoded,train_decoded = autoEncoder(train_img[0,0,:,:].unsqueeze(0).unsqueeze(0))
-            sim = torch.cosine_similarity(test_encoded,train_encoded,dim=1)
+            test_encoded,test_decoded = autoEncoder(test_img) 
+            train_encoded,train_decoded = autoEncoder(train_img)
+            sim = torch.cosine_similarity(test_encoded[0,:,:,:],train_encoded[0,:,:,:],dim=0)
             avg = torch.mean(sim)
             oneImgSim += avg.item()
     
@@ -416,7 +454,9 @@ if __name__ == '__main__':
     test_loader = DataLoader(test_data,
                             shuffle=True,
                             batch_size=1)
-    
+    '''
+    trainEncoder()
+
     calSimilarity(train_loader)
     
     trainFullModel(train_loader, 
@@ -445,7 +485,7 @@ if __name__ == '__main__':
                 foldername='canny_2',
                 if_preprocess=True,
                 version=1)
-    
+    '''
     producePseudoLabelNew(test_loader=test_loader,
                         train_loader=train_loader)
     
