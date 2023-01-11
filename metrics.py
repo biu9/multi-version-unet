@@ -9,9 +9,9 @@ from torch.utils.data import DataLoader
 from utils.load import MyDataset
 from matplotlib import pyplot as plt
 
-MODEL_FINAL_PATH = '/home/ubuntu/multi-version-unet/model/result/final/epoch_200.pth' 
-MODEL_FULL_PATH = '/home/ubuntu/multi-version-unet/model/result/full/epoch_100.pth' # model trained with full train img
-MODEL_BASELINE_PATH = '/home/ubuntu/multi-version-unet/model/result/final_baseline/epoch_200.pth'
+MODEL_FINAL_PATH = '/home/ubuntu/multi-version-unet/model/result/final/epoch_750.pth' 
+MODEL_FULL_PATH = '/home/ubuntu/multi-version-unet/model/result/full/epoch_1000.pth' # model trained with full train img
+MODEL_BASELINE_PATH = '/home/ubuntu/multi-version-unet/model/result/final_baseline/epoch_1000.pth'
 TEST_DATA_PATH = '/home/ubuntu/multiversion-unet/data/testing'
 TRAIN_DATA_PATH = '/home/ubuntu/multiversion-unet/data/training'
 

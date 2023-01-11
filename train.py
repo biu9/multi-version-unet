@@ -368,7 +368,7 @@ def preferModel(train_loader,test_loader):
     fullModel.train()
     optimizer = torch.optim.Adam(fullModel.parameters(), lr=0.01)
     loss_fn = DiceLoss()
-    epochs = 201
+    epochs = 301
 
     loss_item = []
     loss_RV_item = []
@@ -458,7 +458,7 @@ if __name__ == '__main__':
     trainEncoder()
 
     calSimilarity(train_loader)
-    
+    '''
     trainFullModel(train_loader, 
                 test_loader)
     
@@ -485,7 +485,7 @@ if __name__ == '__main__':
                 foldername='canny_2',
                 if_preprocess=True,
                 version=1)
-    '''
+    
     producePseudoLabelNew(test_loader=test_loader,
                         train_loader=train_loader)
     

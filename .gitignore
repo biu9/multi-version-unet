@@ -6,3 +6,4 @@ nohup.out
 /tmpSave
 /tmpSave/totalSim.txt
 /utils/__pycache__
+*.out

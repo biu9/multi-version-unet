@@ -10,11 +10,11 @@ from tqdm import tqdm
 import cv2
 import SimpleITK as sitk
 
-MODEL_FULL_PATH = '/home/ubuntu/multi-version-unet/model/result/baseline_full/epoch_300.pth'
-MODEL_RANDOM_1_PATH = '/home/ubuntu/multi-version-unet/model/result/random_1/epoch_300.pth'
-MODEL_RANDOM_2_PATH = '/home/ubuntu/multi-version-unet/model/result/random_2/epoch_300.pth'
-MODEL_RANDOM_3_PATH = '/home/ubuntu/multi-version-unet/model/result/random_3/epoch_300.pth'
-MODEL_RANDOM_4_PATH = '/home/ubuntu/multi-version-unet/model/result/random_4/epoch_300.pth'
+MODEL_FULL_PATH = '/home/ubuntu/multi-version-unet/model/result/baseline_full/epoch_1000.pth'
+MODEL_RANDOM_1_PATH = '/home/ubuntu/multi-version-unet/model/result/random_1/epoch_1000.pth'
+MODEL_RANDOM_2_PATH = '/home/ubuntu/multi-version-unet/model/result/random_2/epoch_1000.pth'
+MODEL_RANDOM_3_PATH = '/home/ubuntu/multi-version-unet/model/result/random_3/epoch_1000.pth'
+MODEL_RANDOM_4_PATH = '/home/ubuntu/multi-version-unet/model/result/random_4/epoch_1000.pth'
 PSEUDO_PATH = '/home/ubuntu/multi-version-unet/tmpSave/pseudoLabel_baseline'
 
 def cannyProcess(img):
@@ -31,7 +31,7 @@ def trainFullModel(train_loader,test_loader):
     model = UNet(3,3).to(device)
     loss_fn = DiceLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.01)
-    epochs = 301
+    epochs = 1001
 
     loss_item = []
     loss_RV_item = []
@@ -88,7 +88,7 @@ def trainModel(train_loader,test_loader,if_preprocess,foldername,version):
     model = UNet(3,3).to(device)
     loss_fn = DiceLoss()
     optimizer = optim.Adam(model.parameters(), lr=0.01)
-    epochs = 301
+    epochs = 1001
 
     loss_item = []
     loss_RV_item = []
